@@ -1,0 +1,72 @@
+version: "3.8"
+# NOTE! This docker container has hard-coded values for passwords - this is intentional as this is testing machine. DO NOT EXPOSE TO THE INTERNET.
+# Nuke
+# docker-compose down
+# docker-compose rm -sf database
+# docker volume rm docker_db-data
+# docker-compose up --build
+# open a new terminal tab and run
+# docker-compose exec wordpress bash -c "cd /var/www/html && source /root/.bashrc && dbinit && create_posts"
+services:
+  database:
+    image: mariadb:10.6.4-focal
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 'CTBB_ROOT_PASSWD'
+      MYSQL_DATABASE: 'CTBB_WP_DB'
+      MYSQL_USER: 'CTBB_WP_DB_USER'
+      MYSQL_PASSWORD: 'CTBB_WP_DB_PASSWD'
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - wordpress-network
+    deploy:
+      resources:
+        limits:
+          memory: 2048m
+
+  phpmyadmin:
+    platform: linux/amd64
+    depends_on:
+      - database
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    ports:
+      - 1338:80
+    environment:
+      PMA_HOST: database
+      MYSQL_ROOT_PASSWORD: 'CTBB_ROOT_PASSWD'
+    networks:
+      - wordpress-network
+
+  wordpress:
+    depends_on:
+      - database
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 1337:80
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_NAME: 'CTBB_WP_DB'
+      WORDPRESS_DB_USER: 'CTBB_WP_DB_USER'
+      WORDPRESS_DB_PASSWORD: 'CTBB_WP_DB_PASSWD'
+      WP_CLI_ALLOW_ROOT: 'true' # to omit the --allow-root
+      PHP_EXTENSION_XDEBUG: 1
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - ./wp_helpers.sh:/root/.bashrc
+      - ./php.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    networks:
+      - wordpress-network
+
+volumes:
+  db-data:
+
+networks:
+  wordpress-network:
+    driver: bridge  
