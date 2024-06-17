@@ -5,9 +5,8 @@ RUN pecl install xdebug
 RUN pecl install ast
 RUN docker-php-ext-enable xdebug
 
-RUN curl -k -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-RUN chmod +x wp-cli.phar
-RUN mv wp-cli.phar /usr/local/bin/wp
+RUN curl -k https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /usr/local/bin/wp
+RUN chmod +x /usr/local/bin/wp
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php
