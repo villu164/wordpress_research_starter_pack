@@ -1,5 +1,5 @@
 set -e # fail
-
+docker-compose version || alias docker-compose='docker compose'
 mkdir -p wp-content
 docker-compose down
 docker-compose rm -sf database || echo 'Ignore if cannot remove'
