@@ -1,8 +1,12 @@
+# Getting Started
 ```sh
-sh reset.sh # to reset or when running first time
-sh init.sh # to initialize after build
-docker-compose stop # stop
-docker-compose up # start
-docker-compose exec wordpress bash # to get shell
-docker-compose exec wordpress bash -c "whoami" # to run commands
+git clone git@github.com:villu164/wordpress_research_starter_pack.git && \
+  cd wordpress_research_starter_pack && \
+  sh reset.sh
+```
+
+# And if you are lazy like me, open a new tab and run
+
+```sh
+sh init.sh
 ```
